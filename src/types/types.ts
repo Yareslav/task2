@@ -1,6 +1,4 @@
-import { AnyAction } from "redux";
-import { StoreState } from "../redux/store";
-import { ThunkAction } from "redux-thunk";
+import { INotePosition } from "../redux/reducers/notesReducer";
 
 export interface INote {
   name: string;
@@ -17,4 +15,19 @@ export interface IStatistics {
   notesNum: number;
 }
 
-export type ThunkType = ThunkAction<void, StoreState, unknown, AnyAction>;
+interface ICreateMode {
+  mode: "create";
+}
+
+interface IEditMode extends Pick<INote, "category" | "content" | "name"> {
+  storeType: INotePosition["storeType"];
+  mode: "edit";
+  searchKey: string;
+}
+
+interface IDisabled {
+  mode: "disabled";
+}
+
+export type FormWindowProps = ICreateMode | IEditMode;
+export type FormWindowController = ICreateMode | IEditMode | IDisabled;

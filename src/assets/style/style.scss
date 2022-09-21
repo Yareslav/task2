@@ -108,6 +108,10 @@ body{
 			width: 70px;
 		}
 	}
+	&__error {
+		color:red;
+		font-size: 15px;
+	}
 }
 
 .table {
@@ -159,20 +163,19 @@ body{
 	}
 
 }
-
 .notes-grid{
 	display: grid;
 	grid-template-columns: repeat(3,1fr) 2fr 1fr repeat(3,50px);
 	gap:10px;
 	width:100%;
+	& img {
+		cursor: pointer;
+	}
 }
 
 .statistics-grids{
 	display: grid;
 	grid-template-columns: repeat(3,1fr);
 	width: 100%;
-}
-
-#delete , #edit , #archive {
-	cursor: pointer;
+	justify-items: center;
 }

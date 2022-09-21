@@ -1,10 +1,12 @@
-import { memo } from "react";
+import { memo, useContext } from "react";
 import { INote, IStatistics } from "../types/types";
 import NoteTableRow from "../layout/NoteTableRow";
 import Delete from "../assets/images/delete.png";
 import Draw from "../assets/images/draw.png";
 import Archive from "../assets/images/archive.png";
 import { useTypedDispatch } from "../hooks/redux";
+import { WindowFormContext } from "../contexts/contexts";
+import { deleteNote } from "../redux/reducers/notesReducer";
 
 interface IStatisticsTableProps {
   type: "statistics";
@@ -19,6 +21,7 @@ interface INoteTableProps {
 const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }) => {
   const textForEmptyTable: React.ReactNode = data.length === 0 && <h1>Nothing to show</h1>;
   const dispatch = useTypedDispatch();
+  const setWindowFormState = useContext(WindowFormContext);
 
   if (type === "statistics") {
     return (
@@ -46,7 +49,9 @@ const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }
 
   const editHandler = (key: string): void => {};
 
-  const archiveHandler = (key: string): void => {};
+  const archiveHandler = (key: string): void => {
+    dispatch(ar);
+  };
 
   return (
     <div className="active-notes-table beet2 table">

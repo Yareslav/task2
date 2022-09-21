@@ -12,7 +12,7 @@ const initialState: IState = {
   archivedNotes: [],
 };
 
-interface NotePosition {
+export interface INotePosition {
   storeType: keyof IState;
   key: string;
 }
@@ -33,7 +33,7 @@ const notesReducer = createSlice({
   name: "notesReducer",
   initialState,
   reducers: {
-    deleteNote: (state, { payload: { storeType, key } }: PayloadAction<NotePosition>) => {
+    deleteNote: (state, { payload: { storeType, key } }: PayloadAction<INotePosition>) => {
       const removedItemIndex = findIndex(state[storeType], key);
       if (removedItemIndex < 0) return;
 
@@ -41,7 +41,7 @@ const notesReducer = createSlice({
       saveDataToStorage(storeType, state[storeType]);
     },
 
-    editNote: (state, { payload }: PayloadAction<NotePosition & Omit<INote, "id" | "created">>) => {
+    editNote: (state, { payload }: PayloadAction<INotePosition & Omit<INote, "key" | "created">>) => {
       const note = state[payload.storeType].find((elem) => elem.key === payload.key);
       if (!note) return;
 
