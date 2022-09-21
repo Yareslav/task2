@@ -1,10 +1,12 @@
-import { memo } from "react";
+import { memo, useContext } from "react";
 import { INote, IStatistics } from "../types/types";
 import NoteTableRow from "../layout/NoteTableRow";
 import Delete from "../assets/images/delete.png";
 import Draw from "../assets/images/draw.png";
 import Archive from "../assets/images/archive.png";
 import { useTypedDispatch } from "../hooks/redux";
+import { deleteNote, archiveOrUnarchiveNote, INotePosition } from "../redux/reducers/notesReducer";
+import { dispatchFn } from "../types/types";
 
 interface IStatisticsTableProps {
   type: "statistics";
@@ -42,11 +44,15 @@ const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }
     );
   }
 
-  const deleteHandler = (key: string): void => {};
+  //! it is a bad practise to fire dispatch in dumb(layout) component
+  //! so we declare dispatch function and pass them into dumb component as prop
+  const deleteHandler: dispatchFn = (props) => {
+    if (window.confirm("Do you really want tyo delete this item ?")) dispatch(deleteNote(props));
+  };
 
-  const editHandler = (key: string): void => {};
-
-  const archiveHandler = (key: string): void => {};
+  const archiveHandler: dispatchFn = (props) => {
+    dispatch(archiveOrUnarchiveNote(props));
+  };
 
   return (
     <div className="active-notes-table beet2 table">
@@ -63,7 +69,14 @@ const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }
       <div className="table__flow">
         {textForEmptyTable}
         {data.map(({ key, ...props }) => (
-          <NoteTableRow key={key} {...props} isArchived={type === "archivedNotes"} />
+          <NoteTableRow
+            key={key}
+            {...props}
+            isArchived={type === "archivedNotes"}
+            searchKey={key}
+            deleteHandler={deleteHandler}
+            archiveHandler={archiveHandler}
+          />
         ))}
       </div>
     </div>

@@ -12,7 +12,7 @@ const initialState: IState = {
   archivedNotes: [],
 };
 
-interface NotePosition {
+export interface INotePosition {
   storeType: keyof IState;
   key: string;
 }
@@ -33,7 +33,7 @@ const notesReducer = createSlice({
   name: "notesReducer",
   initialState,
   reducers: {
-    deleteNote: (state, { payload: { storeType, key } }: PayloadAction<NotePosition>) => {
+    deleteNote: (state, { payload: { storeType, key } }: PayloadAction<INotePosition>) => {
       const removedItemIndex = findIndex(state[storeType], key);
       if (removedItemIndex < 0) return;
 
@@ -41,7 +41,7 @@ const notesReducer = createSlice({
       saveDataToStorage(storeType, state[storeType]);
     },
 
-    editNote: (state, { payload }: PayloadAction<NotePosition & Omit<INote, "id" | "created">>) => {
+    editNote: (state, { payload }: PayloadAction<INotePosition & Omit<INote, "key" | "created">>) => {
       const note = state[payload.storeType].find((elem) => elem.key === payload.key);
       if (!note) return;
 
@@ -58,9 +58,25 @@ const notesReducer = createSlice({
       saveDataToStorage("activeNotes", state.activeNotes);
     },
 
+    archiveOrUnarchiveNote: (state, { payload: { storeType, key } }: PayloadAction<INotePosition>) => {
+      const removedItemIndex = findIndex(state[storeType], key);
+
+      if (removedItemIndex < 0) return;
+
+      const note: INote = state[storeType].splice(removedItemIndex, 1)[0];
+
+      const anotherStoreName = storeType === "activeNotes" ? "archivedNotes" : "activeNotes";
+      state[anotherStoreName].push(note);
+
+      saveDataToStorage("activeNotes", state["activeNotes"]);
+      saveDataToStorage("archivedNotes", state["archivedNotes"]);
+    },
+
     loadActiveNotes: (state) => {
-      const data = getDataFromStorage("activeNotes");
-      state.activeNotes = data.length === 0 ? notes : data;
+      const activeNotes = getDataFromStorage("activeNotes");
+      const archivedNotes = getDataFromStorage("archivedNotes");
+
+      state.activeNotes = activeNotes.length === 0 && archivedNotes.length === 0 ? notes : activeNotes;
     },
 
     loadArchivedNotes: (state) => {
@@ -69,6 +85,7 @@ const notesReducer = createSlice({
   },
 });
 
-export const { deleteNote, editNote, createNote, loadActiveNotes, loadArchivedNotes } = notesReducer.actions;
+export const { deleteNote, editNote, createNote, loadActiveNotes, loadArchivedNotes, archiveOrUnarchiveNote } =
+  notesReducer.actions;
 
 export default notesReducer.reducer;
