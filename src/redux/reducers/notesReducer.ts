@@ -73,8 +73,10 @@ const notesReducer = createSlice({
     },
 
     loadActiveNotes: (state) => {
-      const data = getDataFromStorage("activeNotes");
-      state.activeNotes = data.length === 0 ? notes : data;
+      const activeNotes = getDataFromStorage("activeNotes");
+      const archivedNotes = getDataFromStorage("archivedNotes");
+
+      state.activeNotes = activeNotes.length === 0 && archivedNotes.length === 0 ? notes : activeNotes;
     },
 
     loadArchivedNotes: (state) => {
