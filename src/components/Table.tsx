@@ -5,8 +5,8 @@ import Delete from "../assets/images/delete.png";
 import Draw from "../assets/images/draw.png";
 import Archive from "../assets/images/archive.png";
 import { useTypedDispatch } from "../hooks/redux";
-import { WindowFormContext } from "../contexts/contexts";
-import { deleteNote } from "../redux/reducers/notesReducer";
+import { deleteNote, archiveOrUnarchiveNote, INotePosition } from "../redux/reducers/notesReducer";
+import { dispatchFn } from "../types/types";
 
 interface IStatisticsTableProps {
   type: "statistics";
@@ -21,7 +21,6 @@ interface INoteTableProps {
 const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }) => {
   const textForEmptyTable: React.ReactNode = data.length === 0 && <h1>Nothing to show</h1>;
   const dispatch = useTypedDispatch();
-  const setWindowFormState = useContext(WindowFormContext);
 
   if (type === "statistics") {
     return (
@@ -45,12 +44,14 @@ const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }
     );
   }
 
-  const deleteHandler = (key: string): void => {};
+  //! it is a bad practise to fire dispatch in dumb(layout) component
+  //! so we declare dispatch function and pass them into dumb component as prop
+  const deleteHandler: dispatchFn = (props) => {
+    if (window.confirm("Do you really want tyo delete this item ?")) dispatch(deleteNote(props));
+  };
 
-  const editHandler = (key: string): void => {};
-
-  const archiveHandler = (key: string): void => {
-    dispatch(ar);
+  const archiveHandler: dispatchFn = (props) => {
+    dispatch(archiveOrUnarchiveNote(props));
   };
 
   return (
@@ -68,7 +69,14 @@ const Table: React.FC<IStatisticsTableProps | INoteTableProps> = ({ type, data }
       <div className="table__flow">
         {textForEmptyTable}
         {data.map(({ key, ...props }) => (
-          <NoteTableRow key={key} {...props} isArchived={type === "archivedNotes"} />
+          <NoteTableRow
+            key={key}
+            {...props}
+            isArchived={type === "archivedNotes"}
+            searchKey={key}
+            deleteHandler={deleteHandler}
+            archiveHandler={archiveHandler}
+          />
         ))}
       </div>
     </div>

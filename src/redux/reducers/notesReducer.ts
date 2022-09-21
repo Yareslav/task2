@@ -58,6 +58,20 @@ const notesReducer = createSlice({
       saveDataToStorage("activeNotes", state.activeNotes);
     },
 
+    archiveOrUnarchiveNote: (state, { payload: { storeType, key } }: PayloadAction<INotePosition>) => {
+      const removedItemIndex = findIndex(state[storeType], key);
+
+      if (removedItemIndex < 0) return;
+
+      const note: INote = state[storeType].splice(removedItemIndex, 1)[0];
+
+      const anotherStoreName = storeType === "activeNotes" ? "archivedNotes" : "activeNotes";
+      state[anotherStoreName].push(note);
+
+      saveDataToStorage("activeNotes", state["activeNotes"]);
+      saveDataToStorage("archivedNotes", state["archivedNotes"]);
+    },
+
     loadActiveNotes: (state) => {
       const data = getDataFromStorage("activeNotes");
       state.activeNotes = data.length === 0 ? notes : data;
@@ -69,6 +83,7 @@ const notesReducer = createSlice({
   },
 });
 
-export const { deleteNote, editNote, createNote, loadActiveNotes, loadArchivedNotes } = notesReducer.actions;
+export const { deleteNote, editNote, createNote, loadActiveNotes, loadArchivedNotes, archiveOrUnarchiveNote } =
+  notesReducer.actions;
 
 export default notesReducer.reducer;

@@ -31,3 +31,5 @@ interface IDisabled {
 
 export type FormWindowProps = ICreateMode | IEditMode;
 export type FormWindowController = ICreateMode | IEditMode | IDisabled;
+
+export type dispatchFn = (props: INotePosition) => void;
